@@ -1,0 +1,4 @@
+// resource.rc
+#include "resource.h"
+
+IDB_BITMAP1 BITMAP "porn.bmp"
