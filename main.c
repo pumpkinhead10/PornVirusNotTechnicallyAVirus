@@ -105,7 +105,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM 
     }
 }
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow) {
-    // Windows see everything as window inclduing our application and texts and buttons inside our application. They are see as child windows of our main application window.
+    // Windows see everything as a window inclduing our application, and texts and buttons inside it, they are seen as child windows of our main application window.
     // WinMain is the default execution point for windows application just like int main in normal C.
     // WINAPI or CALLBACK are just function calling conventions it determind how variables are placed in stack.
     // WNDCLASS strucure is a structure that defineds which function is windowprocedure.
