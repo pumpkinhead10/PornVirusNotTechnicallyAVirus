@@ -2,3 +2,4 @@
 #include "resource.h"
 
 IDB_BITMAP1 BITMAP "porn.bmp"
+IDR_MP3FILE1 MP3 "Misan - Ngarr Pone Pyin 3.mp3"
