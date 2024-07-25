@@ -1,7 +1,7 @@
 ### Heres how to compile
 ```
 windres resource.rc -o resource.o
-gcc main.c resource.o -o fuckerman.exe -lgdi32 -luser32 -mwindows
+gcc main.c resource.o -o fuckerman.exe -lgdi32 -luser32 -lwinmm -mwindows
 ```
 ### Instructions
 1. Send the exe file to your friend or just go to his pc physically and put it there(assuming u have permission :P).
