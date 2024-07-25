@@ -11,6 +11,13 @@
 
 HHOOK hHook = NULL;
 HWND hwnd;
+const int WIDTH = 500;
+const int HEIGHT = 400;
+const int TimerInterval = 100;
+int x = 0;
+int y = 0;
+int dx = 4;
+int dy = 4;
 
 char keypressed[5] = {0};
 char lastword = {0};
@@ -51,6 +58,27 @@ LRESULT CALLBACK KeyboardHook(int nCode, WPARAM wParam, LPARAM lParam) {
 LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam) {
 
     switch (uMsg) {
+    case WM_CREATE:
+    // Every milliseconds defined in TimerInterval, this function will send WM_TIMER message to windows procedure
+    // second parameter is Timer id it's for determinding which timer is sending the message when we have multiple timers
+    // but in here with just 1 timer its irrelevant 
+        SetTimer(hwnd, 1, TimerInterval, NULL);
+        return 0;
+    case WM_TIMER:
+        {
+            // x and y start from top left of the screen
+            RECT coordinates; // coordinates of screen
+            GetWindowRect(GetDesktopWindow(), &coordinates);
+
+            x += dx;
+            y += dy;
+
+            // check if window exceed the edges, if then reverse the dx and dy
+            if (x < 0 || (x + WIDTH) > (coordinates.right - coordinates.left)) dx = -dx;
+            if (y < 0 || (y + HEIGHT) > (coordinates.bottom - coordinates.top)) dy = -dy;
+            SetWindowPos(hwnd, HWND_TOPMOST, x, y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+            return 0;
+        }
     case WM_SHOWWINDOW:
         ShowWindow(hwnd, SW_SHOW);
         return 0;
@@ -159,19 +187,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
             WS_POPUP, // Window style
             CW_USEDEFAULT,       // X position
             CW_USEDEFAULT,       // Y position
-            500,       // Width
-            400,       // Height
+            WIDTH,       // Width
+            HEIGHT,       // Height
             NULL,                // No parent window
             NULL,                // No menu
             hInstance,           // Application instance(handle that window passess to id this running program)
             NULL                 // No additional parameters(u can pass any data u like here to window procedure if u want to make persistent data in window procedure loop)
         );
-    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    //(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
     if (hwnd == NULL) {
         return 0;
     }
         // Set the window attributes for transparency
+        // everything that have the color code rgb(255, 255, 255)(white) will be transparent
     if (!SetLayeredWindowAttributes(hwnd, RGB(255, 255, 255), 255, LWA_COLORKEY | LWA_ALPHA)) {
         MessageBox(NULL, "Failed to set layered window attributes!", "Error", MB_OK);
         return 0;
@@ -179,7 +208,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 
     hHook =  SetWindowsHookEx(WH_KEYBOARD_LL,  KeyboardHook, NULL, 0);
 
-        // Run the message loop
+    // Run the message loop
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0) > 0) {
         TranslateMessage(&msg);
