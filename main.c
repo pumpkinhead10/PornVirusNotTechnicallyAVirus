@@ -7,7 +7,7 @@
 
 
 // windres resource.rc -o resource.o
-// gcc main.c resource.o -o fuckerman.exe -lgdi32 -luser32 -mwindows
+// gcc main.c resource.o -o fuckerman.exe -lgdi32 -luser32 -lwinmm -mwindows
 
 
 HHOOK hHook = NULL;
@@ -99,6 +99,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM 
         }
     case WM_SHOWWINDOW:
         ShowWindow(hwnd, SW_SHOW);
+        UpdateWindow(hwnd);
         PlayAudio();
         return 0;
     case WM_CLOSE:
